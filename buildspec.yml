@@ -71,7 +71,7 @@ phases:
                 labels:
                   app: $_PROJECT_NAME
               spec:
-                                containers:
+                containers:
                   - name: $_PROJECT_NAME
                     image: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$_PROJECT_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION
                     ports:
@@ -81,6 +81,10 @@ phases:
                         cpu: 500m
                       requests:
                         cpu: 200m
+                    args:
+                    - /bin/sh
+                    - -c
+                    - touch /tmp/healthy; sleep 30; rm -rf /tmp/healthy; sleep 100
                     readinessProbe:
                       httpGet:
                         path: /actuator/health
@@ -89,16 +93,7 @@ phases:
                       timeoutSeconds: 2
                       periodSeconds: 5
                       failureThreshold: 10
-                    livenessProbe:
-                      httpGet:
-                        path: /actuator/health
-                        port: 8080
-                      initialDelaySeconds: 120
-                      timeoutSeconds: 2
-                      periodSeconds: 5
-                      failureThreshold: 5
           EOF
 cache:
   paths:
     - '/root/.m2/**/*'
-#111123
